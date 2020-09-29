@@ -52,13 +52,40 @@ const translate = (item, arr, arrRu) => {
 };
 
 const getRandomLengthArrow = (arr) => {
-  const start = getRandomNumber(0, arr.length - 1);
-  const end = getRandomNumber(0, arr.length - 1);
+  const start = getRandomNumber(0, arr.length);
+  const end = getRandomNumber(0, arr.length);
   if (start !== end) {
     return (start < end) ? arr.slice(start, end) : arr.slice(end, start);
   }
 
   return getRandomLengthArrow(arr);
+};
+
+const hideCardFeatures = (featuresElementsArr, existingFeaturesArr) => {
+  featuresElementsArr.forEach((feature) => {
+    let isFeatureExist = false;
+    existingFeaturesArr.forEach((featureName) => {
+      if (feature.className.includes(`--${featureName}`)) {
+        isFeatureExist = true;
+      }
+    });
+    if (!isFeatureExist) {
+      feature.classList.add(`hidden`);
+    }
+  });
+};
+
+const renderCardPhotos = (photosArr, photosContainer) => {
+  photosArr.forEach((photoSrc, index) => {
+    const photo = photosContainer.querySelector(`img`);
+    if (index === 0) {
+      photo.src = photoSrc;
+    } else {
+      const newPhoto = photo.cloneNode();
+      newPhoto.src = photoSrc;
+      photosContainer.append(newPhoto);
+    }
+  });
 };
 
 const createAdData = () => {
@@ -107,31 +134,9 @@ const renderAdCard = (adData) => {
   adCard.querySelector(`.popup__type`).textContent = translate(adData.offer.type, PLACE_TYPE, PLACE_TYPE_RU);
   adCard.querySelector(`.popup__text--capacity`).textContent = `${adData.offer.rooms} комнаты для ${adData.offer.guests} гостей`;
   adCard.querySelector(`.popup__text--time`).textContent = `Заезд после ${adData.offer.checkin}, выезд до ${adData.offer.checkout}`;
-
-  adCard.querySelectorAll(`.popup__feature`).forEach((feature) => {
-    let isFeatureExist = false;
-    adData.offer.features.forEach((featureName) => {
-      if (feature.className.includes(`--${featureName}`)) {
-        isFeatureExist = true;
-      }
-    });
-    if (!isFeatureExist) {
-      feature.classList.add(`hidden`);
-    }
-  });
-
+  hideCardFeatures(adCard.querySelectorAll(`.popup__feature`), adData.offer.features);
   adCard.querySelector(`.popup__description`).textContent = adData.offer.description;
-
-  adData.offer.photos.forEach((photoSrc, index) => {
-    const photo = adCard.querySelector(`.popup__photo`);
-    if (index === 0) {
-      photo.src = photoSrc;
-    } else {
-      const newPhoto = photo.cloneNode();
-      newPhoto.src = photoSrc;
-      adCard.querySelector(`.popup__photos`).append(newPhoto);
-    }
-  });
+  renderCardPhotos(adData.offer.photos, adCard.querySelector(`.popup__photos`));
 
   return adCard;
 };
