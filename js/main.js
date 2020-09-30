@@ -1,10 +1,11 @@
 'use strict';
 
 const ADS_AMOUNT = 8;
-const ADS = [];
+const ads = [];
 const AVATAR_IDS = [`01`, `02`, `03`, `04`, `05`, `06`, `07`, `08`];
 const USED_AVATAR_IDS = [];
 const PLACE_TYPE = [`palace`, `flat`, `house`, `bungalow`];
+const PLACE_TYPE_RU = [`Дворец`, `Квартира`, `Дом`, `Бунгало`];
 const HOURS = [`12:00`, `13:00`, `14:00`];
 const FEATURES = [`wifi`, `dishwasher`, `parking`, `washer`, `elevator`, `conditioner`];
 const PHOTOS = [`http://o0.github.io/assets/images/tokyo/hotel1.jpg`, `http://o0.github.io/assets/images/tokyo/hotel2.jpg`, `http://o0.github.io/assets/images/tokyo/hotel3.jpg`];
@@ -21,11 +22,16 @@ const PIN_HEIGHT = 70;
 
 const map = document.querySelector(`.map`);
 const mapPinsContainer = document.querySelector(`.map__pins`);
+const mapFilterContainer = document.querySelector(`.map__filters-container`);
 const mapPinsContainerWidth = mapPinsContainer.offsetWidth;
 const fragment = document.createDocumentFragment();
 const adTemplate = document.querySelector(`#pin`)
   .content
   .querySelector(`.map__pin`);
+
+const adCardTemplate = document.querySelector(`#card`)
+  .content
+  .querySelector(`.map__card`);
 
 
 const getRandomNumber = (min, max) => {
@@ -41,14 +47,45 @@ const getUniqueAvatarId = (idArr, usedIdArr) => {
   return getUniqueAvatarId(idArr, usedIdArr);
 };
 
+const translate = (item, arr, arrRu) => {
+  return arrRu[arr.indexOf(item)];
+};
+
 const getRandomLengthArrow = (arr) => {
-  const start = getRandomNumber(0, arr.length - 1);
-  const end = getRandomNumber(0, arr.length - 1);
+  const start = getRandomNumber(0, arr.length);
+  const end = getRandomNumber(0, arr.length);
   if (start !== end) {
     return (start < end) ? arr.slice(start, end) : arr.slice(end, start);
   }
 
   return getRandomLengthArrow(arr);
+};
+
+const hideCardFeatures = (featuresElementsArr, existingFeaturesArr) => {
+  featuresElementsArr.forEach((feature) => {
+    let isFeatureExist = false;
+    existingFeaturesArr.forEach((featureName) => {
+      if (feature.className.includes(`--${featureName}`)) {
+        isFeatureExist = true;
+      }
+    });
+    if (!isFeatureExist) {
+      feature.classList.add(`hidden`);
+    }
+  });
+};
+
+const renderCardPhotos = (photosArr, photosContainer) => {
+  photosArr.forEach((photoSrc, index) => {
+    const photo = photosContainer.querySelector(`img`);
+    if (index === 0) {
+      photo.src = photoSrc;
+    } else {
+      const newPhoto = photo.cloneNode();
+      newPhoto.src = photoSrc;
+      photosContainer.append(newPhoto);
+    }
+  });
 };
 
 const createAdData = () => {
@@ -88,6 +125,23 @@ const renderAd = (adData) => {
   return ad;
 };
 
+const renderAdCard = (adData) => {
+  const adCard = adCardTemplate.cloneNode(true);
+  adCard.querySelector(`.popup__avatar`).src = adData.author.avatar;
+  adCard.querySelector(`.popup__title`).textContent = adData.offer.title;
+  adCard.querySelector(`.popup__text--address`).textContent = adData.offer.address;
+  adCard.querySelector(`.popup__text--price`).innerHTML = `${adData.offer.price}&#x20bd;<span>/ночь</span>`;
+  adCard.querySelector(`.popup__type`).textContent = translate(adData.offer.type, PLACE_TYPE, PLACE_TYPE_RU);
+  adCard.querySelector(`.popup__text--capacity`).textContent = `${adData.offer.rooms} комнаты для ${adData.offer.guests} гостей`;
+  adCard.querySelector(`.popup__text--time`).textContent = `Заезд после ${adData.offer.checkin}, выезд до ${adData.offer.checkout}`;
+  hideCardFeatures(adCard.querySelectorAll(`.popup__feature`), adData.offer.features);
+  adCard.querySelector(`.popup__description`).textContent = adData.offer.description;
+  renderCardPhotos(adData.offer.photos, adCard.querySelector(`.popup__photos`));
+
+  return adCard;
+};
+
+
 const appendAds = (adsArr) => {
   adsArr.forEach((ad) => {
     fragment.append(renderAd(ad));
@@ -98,9 +152,11 @@ const appendAds = (adsArr) => {
 };
 
 for (let i = 0; i < ADS_AMOUNT; i++) {
-  ADS.push(createAdData());
+  ads.push(createAdData());
 }
 
 map.classList.remove(`map--faded`);
 
-appendAds(ADS);
+appendAds(ads);
+
+mapFilterContainer.before(renderAdCard(ads[0]));
