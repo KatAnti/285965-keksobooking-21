@@ -17,6 +17,7 @@ const LOCATION_Y_START = 130;
 const LOCATION_Y_END = 630;
 const PRICE_MIN = 3000;
 const PRICE_MAX = 25000;
+const ROOMS_MAX = 100;
 const PIN_WIDTH = 50;
 const PIN_HEIGHT = 70;
 const START_PIN_WIDTH = 65;
@@ -197,16 +198,16 @@ const setMainPinAdress = (isPageActive) => {
   let x = parseInt(startPin.style.left, 10);
   let y = parseInt(startPin.style.top, 10);
   if (isPageActive) {
-    x = x - START_PIN_WIDTH / 2;
-    y = y - START_PIN_HEIGHT;
+    x = x + START_PIN_WIDTH / 2;
+    y = y + START_PIN_HEIGHT;
   }
-  adress.value = `${x}, ${y}`;
+  adress.value = `${Math.round(x)}, ${Math.round(y)}`;
 };
 
 const checkRoomsNumberCapacity = () => {
   guestsAmountInput.querySelectorAll(`option`).forEach((option) => {
     const isNotEnoughRooms = roomNumberInput.value < option.value;
-    const isHundreedRooms = roomNumberInput.value === `100`;
+    const isHundreedRooms = roomNumberInput.value === ROOMS_MAX;
     const isForGuests = option.value !== `0`;
 
     option.disabled = false;
