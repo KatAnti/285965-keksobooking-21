@@ -5,37 +5,56 @@ const ads = [];
 const AVATAR_IDS = [`01`, `02`, `03`, `04`, `05`, `06`, `07`, `08`];
 const USED_AVATAR_IDS = [];
 const PLACE_TYPE = [`palace`, `flat`, `house`, `bungalow`];
+/*
 const PLACE_TYPE_RU = [`Дворец`, `Квартира`, `Дом`, `Бунгало`];
+*/
 const HOURS = [`12:00`, `13:00`, `14:00`];
 const FEATURES = [`wifi`, `dishwasher`, `parking`, `washer`, `elevator`, `conditioner`];
+const GUESTS_AMOUNT = [`для 1 гостя`, `для 2 гостей`, `для 3 гостей`, `не для гостей`];
+const ROOMS_NUMBER = [`1 комната`, `2 комнаты`, `3 комнаты`, `100 комнат`];
 const PHOTOS = [`http://o0.github.io/assets/images/tokyo/hotel1.jpg`, `http://o0.github.io/assets/images/tokyo/hotel2.jpg`, `http://o0.github.io/assets/images/tokyo/hotel3.jpg`];
 const LOCATION_Y_START = 130;
 const LOCATION_Y_END = 630;
 const PRICE_MIN = 3000;
 const PRICE_MAX = 25000;
-const ROOMS_MIN = 1;
-const ROOMS_MAX = 10;
-const GUESTS_MIN = 1;
-const GUESTS_MAX = 10;
+const ROOMS_MAX = 100;
 const PIN_WIDTH = 50;
 const PIN_HEIGHT = 70;
+const START_PIN_WIDTH = 65;
+const START_PIN_HEIGHT = 87;
+const LEFT_BTN = 0;
+const ENTER = `Enter`;
+const IS_DISABLED = true;
+const IS_ACTIVE = true;
 
 const map = document.querySelector(`.map`);
 const mapPinsContainer = document.querySelector(`.map__pins`);
+/*
 const mapFilterContainer = document.querySelector(`.map__filters-container`);
+*/
+const adForm = document.querySelector(`.ad-form`);
+const filtersForm = document.querySelector(`.map__filters`);
+const startPin = document.querySelector(`.map__pin--main`);
+const adress = document.querySelector(`#address`);
+const roomNumberInput = adForm.querySelector(`#room_number`);
+const guestsAmountInput = adForm.querySelector(`#capacity`);
 const mapPinsContainerWidth = mapPinsContainer.offsetWidth;
 const fragment = document.createDocumentFragment();
 const adTemplate = document.querySelector(`#pin`)
   .content
   .querySelector(`.map__pin`);
 
+/*
 const adCardTemplate = document.querySelector(`#card`)
   .content
   .querySelector(`.map__card`);
-
-
+*/
 const getRandomNumber = (min, max) => {
   return Math.floor(min + Math.random() * (max + 1 - min));
+};
+
+const getRandomFeature = (arr) => {
+  return arr[getRandomNumber(0, arr.length - 1)];
 };
 
 const getUniqueAvatarId = (idArr, usedIdArr) => {
@@ -47,9 +66,11 @@ const getUniqueAvatarId = (idArr, usedIdArr) => {
   return getUniqueAvatarId(idArr, usedIdArr);
 };
 
+/*
 const translate = (item, arr, arrRu) => {
   return arrRu[arr.indexOf(item)];
 };
+*/
 
 const getRandomLengthArrow = (arr) => {
   const start = getRandomNumber(0, arr.length);
@@ -61,6 +82,7 @@ const getRandomLengthArrow = (arr) => {
   return getRandomLengthArrow(arr);
 };
 
+/*
 const hideCardFeatures = (featuresElementsArr, existingFeaturesArr) => {
   featuresElementsArr.forEach((feature) => {
     let isFeatureExist = false;
@@ -74,7 +96,9 @@ const hideCardFeatures = (featuresElementsArr, existingFeaturesArr) => {
     }
   });
 };
+*/
 
+/*
 const renderCardPhotos = (photosArr, photosContainer) => {
   photosArr.forEach((photoSrc, index) => {
     const photo = photosContainer.querySelector(`img`);
@@ -87,6 +111,7 @@ const renderCardPhotos = (photosArr, photosContainer) => {
     }
   });
 };
+*/
 
 const createAdData = () => {
   const locationX = getRandomNumber(0, mapPinsContainerWidth);
@@ -100,11 +125,11 @@ const createAdData = () => {
       title: `Заголовок`,
       address: `${locationX}, ${locationY}`,
       price: getRandomNumber(PRICE_MIN, PRICE_MAX),
-      type: PLACE_TYPE[getRandomNumber(0, PLACE_TYPE.length - 1)],
-      rooms: getRandomNumber(ROOMS_MIN, ROOMS_MAX),
-      guests: getRandomNumber(GUESTS_MIN, GUESTS_MAX),
-      checkin: HOURS[getRandomNumber(0, HOURS.length - 1)],
-      checkout: HOURS[getRandomNumber(0, HOURS.length - 1)],
+      type: getRandomFeature(PLACE_TYPE),
+      rooms: getRandomFeature(ROOMS_NUMBER),
+      guests: getRandomFeature(GUESTS_AMOUNT),
+      checkin: getRandomFeature(HOURS),
+      checkout: getRandomFeature(HOURS),
       features: getRandomLengthArrow(FEATURES),
       description: `Описание`,
       photos: getRandomLengthArrow(PHOTOS)
@@ -125,6 +150,7 @@ const renderAd = (adData) => {
   return ad;
 };
 
+/*
 const renderAdCard = (adData) => {
   const adCard = adCardTemplate.cloneNode(true);
   adCard.querySelector(`.popup__avatar`).src = adData.author.avatar;
@@ -140,6 +166,7 @@ const renderAdCard = (adData) => {
 
   return adCard;
 };
+*/
 
 
 const appendAds = (adsArr) => {
@@ -151,12 +178,73 @@ const appendAds = (adsArr) => {
   mapPinsContainer.append(fragment);
 };
 
+const setFormElementsState = (form, isDisabled) => {
+  Array.from(form.children).forEach((element) => {
+    element.disabled = isDisabled;
+  });
+};
+
+const activatePage = (evt) => {
+  if (map.classList.contains(`map--faded`) && (evt.button === LEFT_BTN || evt.key === ENTER)) {
+    map.classList.remove(`map--faded`);
+    adForm.classList.remove(`ad-form--disabled`);
+    appendAds(ads);
+    setFormElementsState(adForm, false);
+    setFormElementsState(filtersForm, false);
+  }
+};
+
+const setMainPinAdress = (isPageActive) => {
+  let x = parseInt(startPin.style.left, 10);
+  let y = parseInt(startPin.style.top, 10);
+  if (isPageActive) {
+    x = x + START_PIN_WIDTH / 2;
+    y = y + START_PIN_HEIGHT;
+  }
+  adress.value = `${Math.round(x)}, ${Math.round(y)}`;
+};
+
+const checkRoomsNumberCapacity = () => {
+  guestsAmountInput.querySelectorAll(`option`).forEach((option) => {
+    const isNotEnoughRooms = roomNumberInput.value < option.value;
+    const isHundreedRooms = roomNumberInput.value === ROOMS_MAX;
+    const isForGuests = option.value !== `0`;
+
+    option.disabled = false;
+    option.selected = true;
+
+    if (isNotEnoughRooms && !isHundreedRooms ||
+        isHundreedRooms && isForGuests ||
+        !isHundreedRooms && !isForGuests
+    ) {
+      option.disabled = true;
+      option.selected = false;
+    }
+  });
+};
+
 for (let i = 0; i < ADS_AMOUNT; i++) {
   ads.push(createAdData());
 }
 
-map.classList.remove(`map--faded`);
-
-appendAds(ads);
-
+/*
 mapFilterContainer.before(renderAdCard(ads[0]));
+*/
+
+setFormElementsState(adForm, IS_DISABLED);
+setFormElementsState(filtersForm, IS_DISABLED);
+setMainPinAdress(!IS_ACTIVE);
+checkRoomsNumberCapacity();
+
+startPin.addEventListener(`mousedown`, (evt) => {
+  activatePage(evt);
+  setMainPinAdress(IS_ACTIVE);
+});
+
+startPin.addEventListener(`keydown`, (evt) => {
+  activatePage(evt);
+});
+
+roomNumberInput.addEventListener(`click`, () => {
+  checkRoomsNumberCapacity();
+});
