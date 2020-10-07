@@ -43,11 +43,16 @@
     document.removeEventListener(`keypress`, onPopupEscPress);
   };
 
+  const onPopupCloseClick = () => {
+    closePopup();
+  };
+
   const openPopup = (currentId) => {
     mapFilterContainer.before(window.card.render(window.adsData.getArr[currentId]));
-    const closePopupBtn = document.querySelector(`.popup__close`);
+    const closePopupBtn = window.utils.mapElement.querySelector(`.popup`)
+      .querySelector(`.popup__close`);
 
-    closePopupBtn.addEventListener(`click`, closePopup);
+    closePopupBtn.addEventListener(`click`, onPopupCloseClick);
     document.addEventListener(`keydown`, onPopupEscPress);
   };
 
