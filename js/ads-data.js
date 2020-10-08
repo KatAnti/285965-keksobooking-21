@@ -1,6 +1,7 @@
 'use strict';
 
 (() => {
+  const ADS_AMOUNT = 8;
   const USED_AVATAR_IDS = [];
   const LOCATION_Y_START = 130;
   const LOCATION_Y_END = 630;
@@ -43,7 +44,16 @@
     };
   };
 
-  window.adData = {
-    create: createAdData
+  const generateAllAdsData = () => {
+    const ads = [];
+    for (let i = 0; i < ADS_AMOUNT; i++) {
+      ads.push(createAdData());
+    }
+
+    return ads;
+  };
+
+  window.adsData = {
+    getArr: generateAllAdsData()
   };
 })();

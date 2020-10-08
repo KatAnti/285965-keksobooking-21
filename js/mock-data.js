@@ -9,8 +9,8 @@
   const GUESTS_AMOUNT = [`для 1 гостя`, `для 2 гостей`, `для 3 гостей`, `не для гостей`];
   const ROOMS_NUMBER = [`1 комната`, `2 комнаты`, `3 комнаты`, `100 комнат`];
   const PHOTOS = [`http://o0.github.io/assets/images/tokyo/hotel1.jpg`, `http://o0.github.io/assets/images/tokyo/hotel2.jpg`, `http://o0.github.io/assets/images/tokyo/hotel3.jpg`];
-  const PRICE_MIN = 3000;
-  const PRICE_MAX = 25000;
+  const PRICE_MIN = 0;
+  const PRICE_MAX = 1000000;
 
   window.mockData = {
     avatarIds: AVATAR_IDS,
