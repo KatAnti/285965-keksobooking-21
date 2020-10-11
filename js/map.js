@@ -5,17 +5,7 @@
   const START_PIN_WIDTH = 65;
   const START_PIN_HEIGHT = 87;
   const adress = document.querySelector(`#address`);
-  const fragment = document.createDocumentFragment();
   const mapFilterContainer = document.querySelector(`.map__filters-container`);
-
-  const createPins = (adsArr) => {
-    adsArr.forEach((ad, i) => {
-      fragment.append(window.pin.render(ad, i));
-    }
-    );
-
-    window.utils.pinsContainerElement.append(fragment);
-  };
 
   const setMainPinAdress = (isPageActive) => {
     let x = parseInt(window.utils.startPinElement.style.left, 10);
@@ -47,8 +37,8 @@
     closePopup();
   };
 
-  const openPopup = (currentId) => {
-    mapFilterContainer.before(window.card.render(window.adsData.getArr[currentId]));
+  const openPopup = (ads, currentId) => {
+    mapFilterContainer.before(window.card.render(ads[currentId]));
     const closePopupBtn = window.utils.mapElement.querySelector(`.popup`)
       .querySelector(`.popup__close`);
 
@@ -56,15 +46,45 @@
     document.addEventListener(`keydown`, onPopupEscPress);
   };
 
-  window.utils.pinsContainerElement.addEventListener(`click`, (evt) => {
-    if (evt.target && evt.target.matches(`.map__pin`) && !evt.target.matches(`.map__pin--main`)) {
-      closePopup();
-      openPopup(evt.target.dataset.id);
-    }
-  });
+  const appendPinsOnSucessLoad = (ads) => {
+    const fragment = document.createDocumentFragment();
+    ads.forEach((ad, i) => {
+      if (ad.offer) {
+        fragment.append(window.pin.render(ad, i));
+      }
+    });
+
+    window.utils.pinsContainerElement.append(fragment);
+    window.utils.pinsContainerElement.addEventListener(`click`, (evt) => {
+      if (evt.target && evt.target.matches(`.map__pin`) && !evt.target.matches(`.map__pin--main`)) {
+        const pins = document.querySelectorAll(`.map__pin`);
+
+        pins.forEach((pin) => {
+          pin.classList.remove(`map__pin--active`);
+        });
+
+        closePopup();
+        openPopup(ads, evt.target.dataset.id);
+        evt.target.classList.add(`map__pin--active`);
+      }
+    });
+  };
+
+  const showErrorMessage = (errorMessage) => {
+    const node = document.createElement(`div`);
+    node.style = `z-index: 100; margin: 0 auto; text-align: center; background-color: rgba(255, 86, 53, 0.7);`;
+    node.style.position = `absolute`;
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = `20px`;
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement(`afterbegin`, node);
+  };
 
   window.map = {
-    appendPins: createPins,
+    sucsessHandler: appendPinsOnSucessLoad,
+    errorHandler: showErrorMessage,
     setStartPinAdress: setMainPinAdress
   };
 })();
