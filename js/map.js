@@ -4,6 +4,7 @@
   const ESCAPE = `Escape`;
   const START_PIN_WIDTH = 65;
   const START_PIN_HEIGHT = 87;
+  const MAX_ADS_COUNT = 5;
   const adress = document.querySelector(`#address`);
   const mapFilterContainer = document.querySelector(`.map__filters-container`);
 
@@ -46,13 +47,14 @@
     document.addEventListener(`keydown`, onPopupEscPress);
   };
 
-  const appendPinsOnSucessLoad = (ads) => {
+  const drawMapOnSucessLoad = (ads) => {
     const fragment = document.createDocumentFragment();
-    ads.forEach((ad, i) => {
-      if (ad.offer) {
-        fragment.append(window.pin.render(ad, i));
-      }
-    });
+
+    for (let i = 0; i < MAX_ADS_COUNT; i++) {
+      fragment.append(window.pin.render(ads[i], i));
+    }
+
+    window.form.setState(window.utils.filtersFormElement, false);
 
     window.utils.pinsContainerElement.append(fragment);
     window.utils.pinsContainerElement.addEventListener(`click`, (evt) => {
@@ -83,7 +85,7 @@
   };
 
   window.map = {
-    sucsessHandler: appendPinsOnSucessLoad,
+    sucsessHandler: drawMapOnSucessLoad,
     errorHandler: showErrorMessage,
     setStartPinAdress: setMainPinAdress
   };
