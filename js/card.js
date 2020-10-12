@@ -11,7 +11,7 @@
   .content
   .querySelector(`.map__card`);
 
-  const hideCardFeatures = (featuresElementsArr, existingFeaturesArr) => {
+  const renderCardFeatures = (featuresElementsArr, existingFeaturesArr) => {
     featuresElementsArr.forEach((feature) => {
       let isFeatureExist = false;
       existingFeaturesArr.forEach((featureName) => {
@@ -38,24 +38,22 @@
     });
   };
 
+  const hideProperty = (property, ad) => {
+    let classSuffix = property;
+    if (classSuffix === `checkin` || classSuffix === `checkout`) {
+      classSuffix = `time`;
+    } else if (classSuffix === `rooms` || classSuffix === `guests`) {
+      classSuffix = `capacity`;
+    }
+    const propertyElement = ad.querySelector(`.popup__${classSuffix}`) ? ad.querySelector(`.popup__${classSuffix}`) : ad.querySelector(`.popup__text--${classSuffix}`);
+    propertyElement.classList.add(`hidden`);
+  };
+
   const hideEmptyProperties = (adData, adElement) => {
     Object.keys(adData).forEach((adSection) => {
       Object.keys(adData[adSection]).forEach((property) => {
         if (!adData[adSection][property] || adData[adSection][property].length === 0 || parseInt(adData[adSection][property], 10) === 0) {
-          if (adElement.querySelector(`.popup__${property}`)) {
-            adElement.querySelector(`.popup__${property}`).classList.add(`hidden`);
-          } else {
-            switch (property) {
-              case `rooms`:
-              case `guests`:
-                adElement.querySelector(`.popup__text--capacity`).classList.add(`hidden`);
-                break;
-              case `checkout`:
-              case `checkin`:
-                adElement.querySelector(`.popup__text--time`).classList.add(`hidden`);
-                break;
-            }
-          }
+          hideProperty(property, adElement);
         }
       });
     });
@@ -70,7 +68,7 @@
     adCard.querySelector(`.popup__type`).textContent = translateType[adData.offer.type];
     adCard.querySelector(`.popup__text--capacity`).textContent = `${adData.offer.rooms} комнаты для ${adData.offer.guests} гостей`;
     adCard.querySelector(`.popup__text--time`).textContent = `Заезд после ${adData.offer.checkin}, выезд до ${adData.offer.checkout}`;
-    hideCardFeatures(adCard.querySelectorAll(`.popup__feature`), adData.offer.features);
+    renderCardFeatures(adCard.querySelectorAll(`.popup__feature`), adData.offer.features);
     adCard.querySelector(`.popup__description`).textContent = adData.offer.description;
     renderCardPhotos(adData.offer.photos, adCard.querySelector(`.popup__photos`));
     hideEmptyProperties(adData, adCard);
