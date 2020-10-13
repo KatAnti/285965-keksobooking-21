@@ -3,7 +3,6 @@
 const LEFT_BTN = 0;
 const ENTER = `Enter`;
 const IS_DISABLED = true;
-const IS_ACTIVE = true;
 
 const activatePage = (evt) => {
   if (window.utils.mapElement.classList.contains(`map--faded`) && (evt.button === LEFT_BTN || evt.key === ENTER)) {
@@ -16,13 +15,14 @@ const activatePage = (evt) => {
 
 window.form.setState(window.utils.adFormElement, IS_DISABLED);
 window.form.setState(window.utils.filtersFormElement, IS_DISABLED);
-window.map.setStartPinAdress(!IS_ACTIVE);
+window.map.setInputAdress();
 window.form.checkCapacity();
 window.form.syncMinPrice();
 
 window.utils.startPinElement.addEventListener(`mousedown`, (evt) => {
   activatePage(evt);
-  window.map.setStartPinAdress(IS_ACTIVE);
+  window.map.setInputAdress(window.utils.startPinElement.offsetLeft, window.utils.startPinElement.offsetTop);
+  window.map.activateMainPin();
 });
 
 window.utils.startPinElement.addEventListener(`keydown`, (evt) => {

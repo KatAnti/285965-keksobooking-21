@@ -2,20 +2,38 @@
 
 (() => {
   const ESCAPE = `Escape`;
-  const START_PIN_WIDTH = 65;
-  const START_PIN_HEIGHT = 87;
+  const START_PIN_WIDTH = 62;
+  const START_PIN_HEIGHT = 82;
   const MAX_ADS_COUNT = 5;
+  const X_START = 0;
+  const X_END = window.utils.pinsContainerElement.offsetWidth;
+  const Y_START = 130;
+  const Y_END = 630;
+  const MIN_LEFT = X_START - START_PIN_WIDTH / 2;
+  const MAX_RIGHT = X_END - START_PIN_WIDTH / 2;
+  const MIN_TOP = Y_START - START_PIN_HEIGHT;
+  const MAX_BOTTOM = Y_END - START_PIN_HEIGHT;
   const adress = document.querySelector(`#address`);
   const mapFilterContainer = document.querySelector(`.map__filters-container`);
 
-  const setMainPinAdress = (isPageActive) => {
-    let x = parseInt(window.utils.startPinElement.style.left, 10);
-    let y = parseInt(window.utils.startPinElement.style.top, 10);
-    if (isPageActive) {
-      x = x + START_PIN_WIDTH / 2;
-      y = y + START_PIN_HEIGHT;
-    }
+  const setAdress = (x, y) => {
+    x = x + START_PIN_WIDTH / 2;
+    y = y + START_PIN_HEIGHT;
     adress.value = `${Math.round(x)}, ${Math.round(y)}`;
+  };
+
+  const setMainPinCoords = (x, y) => {
+    if (x) {
+      window.utils.startPinElement.style.left = x + `px`;
+    }
+    if (y) {
+      window.utils.startPinElement.style.top = y + `px`;
+    }
+  };
+
+  const getMainPinCoords = {
+    x: () => window.utils.startPinElement.offsetLeft,
+    y: () => window.utils.startPinElement.offsetTop
   };
 
   const onPopupEscPress = (evt) => {
@@ -84,9 +102,44 @@
     document.body.insertAdjacentElement(`afterbegin`, node);
   };
 
+  const makeMainPinMovable = () => {
+    const onMouseMove = (mouseEvt) => {
+      setMainPinCoords((getMainPinCoords.x() + mouseEvt.movementX), (getMainPinCoords.y() + mouseEvt.movementY));
+
+      const preventPinCrossingBorder = (pinCoord, borderCoord, isMin) => {
+        let coords = (pinCoord === `x`) ? {x: borderCoord, y: false} : {x: false, y: borderCoord};
+        const isCrosingIndicator = isMin ? getMainPinCoords[pinCoord]() < borderCoord : getMainPinCoords[pinCoord]() > borderCoord;
+        if (isCrosingIndicator) {
+          window.utils.pinsContainerElement.removeEventListener(`mousemove`, onMouseMove);
+          setMainPinCoords(coords.x, coords.y);
+        }
+      };
+
+      preventPinCrossingBorder(`x`, MIN_LEFT, true);
+      preventPinCrossingBorder(`x`, MAX_RIGHT, false);
+      preventPinCrossingBorder(`y`, MIN_TOP, true);
+      preventPinCrossingBorder(`y`, MAX_BOTTOM, false);
+
+      window.utils.pinsContainerElement.addEventListener(`mouseleave`, () => {
+        window.utils.pinsContainerElement.removeEventListener(`mousemove`, onMouseMove);
+      });
+
+      window.map.setInputAdress(getMainPinCoords.x(), getMainPinCoords.y());
+    };
+
+    const onMouseUp = () => {
+      window.utils.pinsContainerElement.removeEventListener(`mousemove`, onMouseMove);
+      window.map.setInputAdress(window.utils.startPinElement.offsetLeft, window.utils.startPinElement.offsetTop);
+    };
+
+    window.utils.pinsContainerElement.addEventListener(`mousemove`, onMouseMove);
+    window.utils.pinsContainerElement.addEventListener(`mouseup`, onMouseUp);
+  };
+
   window.map = {
     sucsessHandler: drawMapOnSucessLoad,
     errorHandler: showErrorMessage,
-    setStartPinAdress: setMainPinAdress
+    setInputAdress: setAdress,
+    activateMainPin: makeMainPinMovable
   };
 })();
