@@ -5,6 +5,7 @@
   const mapPinsContainer = map.querySelector(`.map__pins`);
   const adForm = document.querySelector(`.ad-form`);
   const startPin = document.querySelector(`.map__pin--main`);
+  const filtersForm = document.querySelector(`.map__filters`);
 
   const getRandomNumber = (min, max) => {
     return Math.floor(min + Math.random() * (max + 1 - min));
@@ -25,6 +26,7 @@
   };
 
   window.utils = {
+    filtersFormElement: filtersForm,
     mapElement: map,
     pinsContainerElement: mapPinsContainer,
     adFormElement: adForm,
