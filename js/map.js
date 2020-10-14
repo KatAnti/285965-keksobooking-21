@@ -4,21 +4,23 @@
   const ESCAPE = `Escape`;
   const START_PIN_WIDTH = 62;
   const START_PIN_HEIGHT = 82;
+  const INACTIVE_PIN_WIDTH = 65;
+  const INACTIVE_PIN_HEIGHT = 65;
   const MAX_ADS_COUNT = 5;
   const X_START = 0;
   const X_END = window.utils.pinsContainerElement.offsetWidth;
   const Y_START = 130;
   const Y_END = 630;
-  const MIN_LEFT = X_START - START_PIN_WIDTH / 2;
-  const MAX_RIGHT = X_END - START_PIN_WIDTH / 2;
-  const MIN_TOP = Y_START - START_PIN_HEIGHT;
-  const MAX_BOTTOM = Y_END - START_PIN_HEIGHT;
+  const minLeft = X_START - START_PIN_WIDTH / 2;
+  const maxRight = X_END - START_PIN_WIDTH / 2;
+  const minTop = Y_START - START_PIN_HEIGHT;
+  const maxBottom = Y_END - START_PIN_HEIGHT;
   const adress = document.querySelector(`#address`);
   const mapFilterContainer = document.querySelector(`.map__filters-container`);
 
-  const setAdress = (x, y) => {
-    x = x + START_PIN_WIDTH / 2;
-    y = y + START_PIN_HEIGHT;
+  const setAdress = (x, y, isPageActive) => {
+    x = isPageActive ? x + START_PIN_WIDTH / 2 : x + INACTIVE_PIN_WIDTH / 2;
+    y = isPageActive ? y + START_PIN_HEIGHT : y + INACTIVE_PIN_HEIGHT / 2;
     adress.value = `${Math.round(x)}, ${Math.round(y)}`;
   };
 
@@ -115,21 +117,21 @@
         }
       };
 
-      preventPinCrossingBorder(`x`, MIN_LEFT, true);
-      preventPinCrossingBorder(`x`, MAX_RIGHT, false);
-      preventPinCrossingBorder(`y`, MIN_TOP, true);
-      preventPinCrossingBorder(`y`, MAX_BOTTOM, false);
+      preventPinCrossingBorder(`x`, minLeft, true);
+      preventPinCrossingBorder(`x`, maxRight, false);
+      preventPinCrossingBorder(`y`, minTop, true);
+      preventPinCrossingBorder(`y`, maxBottom, false);
 
       window.utils.pinsContainerElement.addEventListener(`mouseleave`, () => {
         window.utils.pinsContainerElement.removeEventListener(`mousemove`, onMouseMove);
       });
 
-      window.map.setInputAdress(getMainPinCoords.x(), getMainPinCoords.y());
+      setAdress(getMainPinCoords.x(), getMainPinCoords.y(), true);
     };
 
     const onMouseUp = () => {
       window.utils.pinsContainerElement.removeEventListener(`mousemove`, onMouseMove);
-      window.map.setInputAdress(window.utils.startPinElement.offsetLeft, window.utils.startPinElement.offsetTop);
+      setAdress(getMainPinCoords.x(), getMainPinCoords.y(), true);
     };
 
     window.utils.pinsContainerElement.addEventListener(`mousemove`, onMouseMove);
