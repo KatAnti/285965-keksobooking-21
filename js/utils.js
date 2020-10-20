@@ -1,6 +1,7 @@
 'use strict';
 
 (() => {
+  const MAX_ADS_COUNT = 5;
   const map = document.querySelector(`.map`);
   const mapPinsContainer = map.querySelector(`.map__pins`);
   const adForm = document.querySelector(`.ad-form`);
@@ -26,6 +27,7 @@
   };
 
   window.utils = {
+    maxAdsAmount: MAX_ADS_COUNT,
     filtersFormElement: filtersForm,
     mapElement: map,
     pinsContainerElement: mapPinsContainer,
