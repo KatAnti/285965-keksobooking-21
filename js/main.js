@@ -12,7 +12,7 @@ const setDataId = (arr) => {
   });
 };
 
-const sucsessHandler = (adsArr) => {
+const successHandler = (adsArr) => {
   ads = adsArr;
   setDataId(ads);
 
@@ -39,7 +39,7 @@ const activatePage = (evt) => {
   if (window.utils.mapElement.classList.contains(`map--faded`) && (evt.button === LEFT_BTN || evt.key === ENTER)) {
     window.utils.mapElement.classList.remove(`map--faded`);
     window.utils.adFormElement.classList.remove(`ad-form--disabled`);
-    window.backend.load(sucsessHandler, window.map.errorHandler);
+    window.backend.load(successHandler, window.map.errorHandler);
     window.form.setState(window.utils.adFormElement, !IS_DISABLED);
   }
 };

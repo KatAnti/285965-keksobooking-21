@@ -1,6 +1,12 @@
 'use strict';
 
 (() => {
+  const LOW_PRICE = 10000;
+  const HIGHT_PRICE = 50000;
+  const LOW_PRICE_LABEL = `low`;
+  const HIGH_PRICE_LABEL = `high`;
+  const MIDDLE_PRICE_LABEL = `middle`;
+  const NO_FILTER_LABEL = `any`;
   const filter = document.querySelector(`.map__filters`);
   const housingType = document.querySelector(`#housing-type`);
   const housingPrice = document.querySelector(`#housing-price`);
@@ -11,13 +17,17 @@
   };
 
   const getPriceCategory = (price) => {
-    let category = `middle`;
-    if (price < 10000) {
-      category = `low`;
-    } else if (price > 50000) {
-      category = `high`;
+    let category;
+    switch (true) {
+      case (price < LOW_PRICE):
+        category = LOW_PRICE_LABEL;
+        break;
+      case (price > HIGHT_PRICE):
+        category = HIGH_PRICE_LABEL;
+        break;
+      default:
+        category = MIDDLE_PRICE_LABEL;
     }
-
     return category;
   };
 
@@ -37,7 +47,7 @@
   const findCurentRank = () => {
     let currentRank = 0;
     filter.querySelectorAll(`select`).forEach((select) => {
-      if (select.value !== `any`) {
+      if (select.value !== NO_FILTER_LABEL) {
         currentRank += 1;
       }
     });
