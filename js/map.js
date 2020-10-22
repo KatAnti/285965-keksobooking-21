@@ -6,7 +6,6 @@
   const START_PIN_HEIGHT = 82;
   const INACTIVE_PIN_WIDTH = 65;
   const INACTIVE_PIN_HEIGHT = 65;
-  const MAX_ADS_COUNT = 5;
   const X_START = 0;
   const X_END = window.utils.pinsContainerElement.offsetWidth;
   const Y_START = 130;
@@ -58,8 +57,8 @@
     closePopup();
   };
 
-  const openPopup = (ads, currentId) => {
-    mapFilterContainer.before(window.card.render(ads[currentId]));
+  const openPopup = (adsArr, currentId) => {
+    mapFilterContainer.before(window.card.render(adsArr[currentId]));
     const closePopupBtn = window.utils.mapElement.querySelector(`.popup`)
       .querySelector(`.popup__close`);
 
@@ -67,29 +66,20 @@
     document.addEventListener(`keydown`, onPopupEscPress);
   };
 
-  const drawMapOnSucessLoad = (ads) => {
+  const renderPins = (adsArr, maxNumber) => {
     const fragment = document.createDocumentFragment();
 
-    for (let i = 0; i < MAX_ADS_COUNT; i++) {
-      fragment.append(window.pin.render(ads[i], i));
-    }
-
-    window.form.setState(window.utils.filtersFormElement, false);
-
-    window.utils.pinsContainerElement.append(fragment);
-    window.utils.pinsContainerElement.addEventListener(`click`, (evt) => {
-      if (evt.target && evt.target.matches(`.map__pin`) && !evt.target.matches(`.map__pin--main`)) {
-        const pins = document.querySelectorAll(`.map__pin`);
-
-        pins.forEach((pin) => {
-          pin.classList.remove(`map__pin--active`);
-        });
-
-        closePopup();
-        openPopup(ads, evt.target.dataset.id);
-        evt.target.classList.add(`map__pin--active`);
+    Array.from(window.utils.pinsContainerElement.children).forEach((element) => {
+      if (!element.matches(`.map__overlay`) && !element.matches(`.map__pin--main`)) {
+        element.remove();
       }
     });
+
+    for (let i = 0; i < maxNumber; i++) {
+      fragment.append(window.pin.render(adsArr[i]));
+    }
+
+    window.utils.pinsContainerElement.append(fragment);
   };
 
   const showErrorMessage = (errorMessage) => {
@@ -139,9 +129,11 @@
   };
 
   window.map = {
-    sucsessHandler: drawMapOnSucessLoad,
     errorHandler: showErrorMessage,
     setInputAdress: setAdress,
-    activateMainPin: makeMainPinMovable
+    activateMainPin: makeMainPinMovable,
+    createPins: renderPins,
+    openCard: openPopup,
+    closeCard: closePopup,
   };
 })();

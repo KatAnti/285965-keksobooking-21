@@ -2,7 +2,7 @@
 
 (() => {
 
-  const getAdsFromServer = (onSucsessLoad, onError) => {
+  const getAdsFromServer = (onSucсessLoad, onError) => {
     const URL = `https://21.javascript.pages.academy/keksobooking/data`;
     const TIMEOUT = 10000;
     const xhr = new XMLHttpRequest();
@@ -14,7 +14,7 @@
 
     xhr.addEventListener(`load`, () => {
       if (xhr.status === StatusCode.OK) {
-        onSucsessLoad(xhr.response);
+        onSucсessLoad(xhr.response);
       } else {
         onError(`Произошла ошибка! Статус ответа: ` + xhr.status + ` ` + xhr.statusText);
       }
