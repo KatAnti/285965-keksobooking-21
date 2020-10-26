@@ -156,9 +156,6 @@
     window.constants.adFormElement.reset();
     disactivatePage();
     createMessagePopup(successMessageTemplate, onDocumentEscCloseSuccessPopup, onDocumentClickCloseSuccessPopup);
-    document.querySelector(`.error__button`).addEventListener(`click`, () => {
-      deleteMessagePopup();
-    });
   };
 
   const onSubmitHandler = (evt) => {
