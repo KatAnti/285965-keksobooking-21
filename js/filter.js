@@ -7,10 +7,8 @@
   const HIGH_PRICE_LABEL = `high`;
   const MIDDLE_PRICE_LABEL = `middle`;
   const NO_FILTER_LABEL = `any`;
-  const filter = document.querySelector(`.map__filters`);
-  const housingType = document.querySelector(`#housing-type`);
-  const housingPrice = document.querySelector(`#housing-price`);
-
+  const housingTypeInput = document.querySelector(`#housing-type`);
+  const housingPriceInput = document.querySelector(`#housing-price`);
 
   let filters = {
     onSelectChange: () => {}
@@ -34,11 +32,11 @@
   const rankItem = (ad) => {
     let rank = 0;
 
-    if (ad.offer.type === housingType.value) {
+    if (ad.offer.type === housingTypeInput.value) {
       rank += 1;
     }
 
-    if (getPriceCategory(ad.offer.price) === housingPrice.value) {
+    if (getPriceCategory(ad.offer.price) === housingPriceInput.value) {
       rank += 1;
     }
     return rank;
@@ -46,12 +44,12 @@
 
   const findCurentRank = () => {
     let currentRank = 0;
-    filter.querySelectorAll(`select`).forEach((select) => {
+    window.constants.filtersFormElement.querySelectorAll(`select`).forEach((select) => {
       if (select.value !== NO_FILTER_LABEL) {
         currentRank += 1;
       }
     });
-    filter.querySelectorAll(`input`).forEach((input) => {
+    window.constants.filtersFormElement.querySelectorAll(`input`).forEach((input) => {
       if (input.checked) {
         currentRank += 1;
       }
@@ -69,11 +67,11 @@
     const suitableAds = adsArr.filter((item) => {
       return rankItem(item) === currentRank;
     });
-    const adsAmount = suitableAds.length > window.utils.maxAdsAmount ? window.utils.maxAdsAmount : suitableAds.length;
+    const adsAmount = suitableAds.length > window.constants.maxAdsAmount ? window.constants.maxAdsAmount : suitableAds.length;
     updatePins(suitableAds, adsAmount);
   };
 
-  filter.addEventListener(`change`, (evt) => {
+  window.constants.filtersFormElement.addEventListener(`change`, (evt) => {
     if (evt.target && evt.target.matches(`select`)) {
       filters.onSelectChange();
     }

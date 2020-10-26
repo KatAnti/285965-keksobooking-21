@@ -2,9 +2,9 @@
 
 (() => {
 
-  const getAdsFromServer = (onSucсessLoad, onError) => {
-    const URL = `https://21.javascript.pages.academy/keksobooking/data`;
+  const makeRequest = (method, onSucсessLoad, onError, data) => {
     const TIMEOUT = 10000;
+    const url = method === `GET` ? `https://21.javascript.pages.academy/keksobooking/data` : `https://21.javascript.pages.academy/keksobooking`;
     const xhr = new XMLHttpRequest();
     const StatusCode = {
       OK: 200
@@ -30,11 +30,24 @@
 
     xhr.timeout = TIMEOUT;
 
-    xhr.open(`GET`, URL);
-    xhr.send();
+    xhr.open(method, url);
+    if (data) {
+      xhr.send(data);
+    } else {
+      xhr.send();
+    }
+  };
+
+  const getAdsFromServer = (onSucсessLoad, onError) => {
+    makeRequest(`GET`, onSucсessLoad, onError);
+  };
+
+  const sendFormData = (data, onSucсessLoad, onError) => {
+    makeRequest(`POST`, onSucсessLoad, onError, data);
   };
 
   window.backend = {
     load: getAdsFromServer,
+    send: sendFormData
   };
 })();
