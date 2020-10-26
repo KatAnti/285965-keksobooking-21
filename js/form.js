@@ -9,6 +9,10 @@
   const HOUSE_MIN_PRICE = 5000;
   const PALACE_MIN_PRICE = 10000;
   const MAX_PRICE = 1000000;
+  const StartCoordinates = {
+    x: 570,
+    y: 375
+  };
   const mainElement = document.querySelector(`main`);
   const roomNumberInput = window.constants.adFormElement.querySelector(`#room_number`);
   const guestsAmountInput = window.constants.adFormElement.querySelector(`#capacity`);
@@ -106,6 +110,7 @@
     setFormElementsState(window.constants.adFormElement, true);
     window.constants.adFormElement.classList.add(`ad-form--disabled`);
     window.map.closeCard();
+    window.map.setMainPinCoords(StartCoordinates.x, StartCoordinates.y);
     window.map.setInputAdress(window.constants.startPinElement.offsetLeft, window.constants.startPinElement.offsetTop, false);
 
     Array.from(window.constants.pinsContainerElement.children).forEach((element) => {

@@ -117,6 +117,7 @@
 
   window.map = {
     setInputAdress,
+    setMainPinCoords,
     activateMainPin,
     createPins,
     openCard,
