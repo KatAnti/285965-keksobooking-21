@@ -9,6 +9,9 @@
   const HOUSE_MIN_PRICE = 5000;
   const PALACE_MIN_PRICE = 10000;
   const MAX_PRICE = 1000000;
+  const HIGH_PRICE_MESSAGE = `Цена не может превышать ${MAX_PRICE}`;
+  const SHORT_TITLE_MESSAGE = `Описание должно быть не короче ${TITLE_LENGTH_MIN} символов`;
+  const LONG_TITLE_MESSAGE = `Вы достигли максимальной длины описания в ${TITLE_LENGTH_MAX} символов`;
   const StartCoordinates = {
     x: 570,
     y: 375
@@ -77,7 +80,7 @@
 
   const validatePrice = () => {
     if (parseInt(priceInput.value, 10) > MAX_PRICE) {
-      priceInput.setCustomValidity(`Цена не может превышать ${MAX_PRICE}`);
+      priceInput.setCustomValidity(HIGH_PRICE_MESSAGE);
     } else {
       priceInput.setCustomValidity(``);
     }
@@ -95,9 +98,9 @@
 
   const validateTitle = () => {
     if (titleInput.value.length < TITLE_LENGTH_MIN) {
-      titleInput.setCustomValidity(`Описание должно быть не короче ${TITLE_LENGTH_MIN} символов`);
+      titleInput.setCustomValidity(SHORT_TITLE_MESSAGE);
     } else if (titleInput.value.length === TITLE_LENGTH_MAX) {
-      titleInput.setCustomValidity(`Вы достигли максимальной длины описания в ${TITLE_LENGTH_MAX} символов`);
+      titleInput.setCustomValidity(LONG_TITLE_MESSAGE);
     } else {
       titleInput.setCustomValidity(``);
     }
@@ -106,6 +109,8 @@
   };
 
   const disactivatePage = () => {
+    window.constants.adFormElement.reset();
+    window.constants.filtersFormElement.reset();
     window.constants.mapElement.classList.add(`map--faded`);
     setFormElementsState(window.constants.adFormElement, true);
     window.constants.adFormElement.classList.add(`ad-form--disabled`);
@@ -158,7 +163,6 @@
   };
 
   const successHandler = () => {
-    window.constants.adFormElement.reset();
     disactivatePage();
     createMessagePopup(successMessageTemplate, onDocumentEscCloseSuccessPopup, onDocumentClickCloseSuccessPopup);
   };
@@ -171,8 +175,7 @@
 
   const onResetHandler = (evt) => {
     evt.preventDefault();
-    window.constants.adFormElement.reset();
-    window.map.setInputAdress(window.constants.startPinElement.offsetLeft, window.constants.startPinElement.offsetTop, true);
+    disactivatePage();
   };
 
   titleInput.addEventListener(`input`, () => {

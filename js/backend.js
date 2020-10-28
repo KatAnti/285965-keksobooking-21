@@ -1,10 +1,11 @@
 'use strict';
 
 (() => {
+  const urlGetAds = `https://21.javascript.pages.academy/keksobooking/data`;
+  const urlSendForm = `https://21.javascript.pages.academy/keksobooking`;
 
-  const makeRequest = (method, onSucсessLoad, onError, data) => {
+  const makeRequest = (onSucсessLoad, onError) => {
     const TIMEOUT = 10000;
-    const url = method === `GET` ? `https://21.javascript.pages.academy/keksobooking/data` : `https://21.javascript.pages.academy/keksobooking`;
     const xhr = new XMLHttpRequest();
     const StatusCode = {
       OK: 200
@@ -30,20 +31,19 @@
 
     xhr.timeout = TIMEOUT;
 
-    xhr.open(method, url);
-    if (data) {
-      xhr.send(data);
-    } else {
-      xhr.send();
-    }
+    return xhr;
   };
 
   const getAdsFromServer = (onSucсessLoad, onError) => {
-    makeRequest(`GET`, onSucсessLoad, onError);
+    const xhr = makeRequest(onSucсessLoad, onError);
+    xhr.open(`GET`, urlGetAds);
+    xhr.send();
   };
 
   const sendFormData = (data, onSucсessLoad, onError) => {
-    makeRequest(`POST`, onSucсessLoad, onError, data);
+    const xhr = makeRequest(onSucсessLoad, onError);
+    xhr.open(`POST`, urlSendForm);
+    xhr.send(data);
   };
 
   window.backend = {
