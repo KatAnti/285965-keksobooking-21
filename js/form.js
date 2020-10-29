@@ -8,13 +8,29 @@
   const FLAT_MIN_PRICE = 1000;
   const HOUSE_MIN_PRICE = 5000;
   const PALACE_MIN_PRICE = 10000;
-  const roomNumberInput = window.utils.adFormElement.querySelector(`#room_number`);
-  const guestsAmountInput = window.utils.adFormElement.querySelector(`#capacity`);
-  const priceInput = window.utils.adFormElement.querySelector(`#price`);
-  const typeInput = window.utils.adFormElement.querySelector(`#type`);
-  const checkInInput = window.utils.adFormElement.querySelector(`#timein`);
-  const checkOutInput = window.utils.adFormElement.querySelector(`#timeout`);
-  const titleInput = window.utils.adFormElement.querySelector(`#title`);
+  const MAX_PRICE = 1000000;
+  const HIGH_PRICE_MESSAGE = `Цена не может превышать ${MAX_PRICE}`;
+  const SHORT_TITLE_MESSAGE = `Описание должно быть не короче ${TITLE_LENGTH_MIN} символов`;
+  const LONG_TITLE_MESSAGE = `Вы достигли максимальной длины описания в ${TITLE_LENGTH_MAX} символов`;
+  const StartCoordinates = {
+    x: 570,
+    y: 375
+  };
+  const mainElement = document.querySelector(`main`);
+  const roomNumberInput = window.constants.adFormElement.querySelector(`#room_number`);
+  const guestsAmountInput = window.constants.adFormElement.querySelector(`#capacity`);
+  const priceInput = window.constants.adFormElement.querySelector(`#price`);
+  const typeInput = window.constants.adFormElement.querySelector(`#type`);
+  const checkInInput = window.constants.adFormElement.querySelector(`#timein`);
+  const checkOutInput = window.constants.adFormElement.querySelector(`#timeout`);
+  const titleInput = window.constants.adFormElement.querySelector(`#title`);
+  const resetFormButton = window.constants.adFormElement.querySelector(`.ad-form__reset`);
+  const successMessageTemplate = document.querySelector(`#success`)
+    .content
+    .querySelector(`.success`);
+  const errorMessageTemplate = document.querySelector(`#error`)
+    .content
+    .querySelector(`.error`);
 
   const setFormElementsState = (form, isDisabled) => {
     Array.from(form.children).forEach((element) => {
@@ -63,8 +79,8 @@
   };
 
   const validatePrice = () => {
-    if (parseInt(priceInput.value, 10) > window.mockData.priceMax) {
-      priceInput.setCustomValidity(`Цена не может превышать ${window.mockData.priceMax}`);
+    if (parseInt(priceInput.value, 10) > MAX_PRICE) {
+      priceInput.setCustomValidity(HIGH_PRICE_MESSAGE);
     } else {
       priceInput.setCustomValidity(``);
     }
@@ -82,14 +98,84 @@
 
   const validateTitle = () => {
     if (titleInput.value.length < TITLE_LENGTH_MIN) {
-      titleInput.setCustomValidity(`Описание должно быть не короче ${TITLE_LENGTH_MIN} символов`);
+      titleInput.setCustomValidity(SHORT_TITLE_MESSAGE);
     } else if (titleInput.value.length === TITLE_LENGTH_MAX) {
-      titleInput.setCustomValidity(`Вы достигли максимальной длины описания в ${TITLE_LENGTH_MAX} символов`);
+      titleInput.setCustomValidity(LONG_TITLE_MESSAGE);
     } else {
       titleInput.setCustomValidity(``);
     }
 
     titleInput.reportValidity();
+  };
+
+  const disactivatePage = () => {
+    window.constants.adFormElement.reset();
+    window.constants.filtersFormElement.reset();
+    window.constants.mapElement.classList.add(`map--faded`);
+    setFormElementsState(window.constants.adFormElement, true);
+    window.constants.adFormElement.classList.add(`ad-form--disabled`);
+    window.map.closeCard();
+    window.map.setMainPinCoords(StartCoordinates.x, StartCoordinates.y);
+    window.map.setInputAdress(window.constants.startPinElement.offsetLeft, window.constants.startPinElement.offsetTop, false);
+
+    Array.from(window.constants.pinsContainerElement.children).forEach((element) => {
+      if (element.matches(`.map__pin`) && !element.matches(`.map__pin--main`)) {
+        element.remove();
+      }
+    });
+  };
+
+  const onDocumentEscCloseSuccessPopup = (evt) => {
+    if (evt.key === window.constants.escape) {
+      deleteMessagePopup(document.querySelector(`.success`), onDocumentEscCloseSuccessPopup, onDocumentClickCloseSuccessPopup);
+    }
+  };
+
+  const onDocumentClickCloseSuccessPopup = () => {
+    deleteMessagePopup(document.querySelector(`.success`), onDocumentEscCloseSuccessPopup, onDocumentClickCloseSuccessPopup);
+  };
+
+  const onDocumentEscCloseErrorPopup = (evt) => {
+    if (evt.key === window.constants.escape) {
+      deleteMessagePopup(document.querySelector(`.error`), onDocumentEscCloseErrorPopup, onDocumentClickCloseErrorPopup);
+    }
+  };
+
+  const onDocumentClickCloseErrorPopup = () => {
+    deleteMessagePopup(document.querySelector(`.error`), onDocumentEscCloseErrorPopup, onDocumentClickCloseErrorPopup);
+  };
+
+  const createMessagePopup = (template, onEsc, onClick) => {
+    const message = template.cloneNode(true);
+    mainElement.appendChild(message);
+    document.addEventListener(`keydown`, onEsc);
+    document.addEventListener(`click`, onClick);
+  };
+
+  const deleteMessagePopup = (popup, onEsc, onClick) => {
+    popup.remove();
+    document.removeEventListener(`keydown`, onEsc);
+    document.removeEventListener(`click`, onClick);
+  };
+
+  const errorHandler = () => {
+    createMessagePopup(errorMessageTemplate, onDocumentEscCloseErrorPopup, onDocumentClickCloseErrorPopup);
+  };
+
+  const successHandler = () => {
+    disactivatePage();
+    createMessagePopup(successMessageTemplate, onDocumentEscCloseSuccessPopup, onDocumentClickCloseSuccessPopup);
+  };
+
+  const onSubmitHandler = (evt) => {
+    evt.preventDefault();
+
+    window.backend.send(new FormData(window.constants.adFormElement), successHandler, errorHandler);
+  };
+
+  const onResetHandler = (evt) => {
+    evt.preventDefault();
+    disactivatePage();
   };
 
   titleInput.addEventListener(`input`, () => {
@@ -115,6 +201,9 @@
   checkOutInput.addEventListener(`click`, (evt) => {
     syncTime(evt);
   });
+
+  window.constants.adFormElement.addEventListener(`submit`, onSubmitHandler);
+  resetFormButton.addEventListener(`click`, onResetHandler);
 
   window.form = {
     setState: setFormElementsState,
