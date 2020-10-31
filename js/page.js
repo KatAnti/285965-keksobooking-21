@@ -2,6 +2,10 @@
 
 let adsFiltered = [];
 const LEFT_BTN = 0;
+const StartCoordinates = {
+  x: 570,
+  y: 375
+};
 
 const setDataId = (arr) => {
   arr.forEach((item, index) => {
@@ -53,8 +57,27 @@ const activatePage = (evt) => {
   }
 };
 
+const disactivatePage = () => {
+  window.constants.adFormElement.reset();
+  window.constants.filtersFormElement.reset();
+  window.form.syncMinPrice();
+  window.constants.mapElement.classList.add(`map--faded`);
+  window.form.setState(window.constants.adFormElement, true);
+  window.constants.adFormElement.classList.add(`ad-form--disabled`);
+  window.map.closeCard();
+  window.map.setMainPinCoords(StartCoordinates.x, StartCoordinates.y);
+  window.map.setInputAdress(window.constants.startPinElement.offsetLeft, window.constants.startPinElement.offsetTop, false);
+
+  Array.from(window.constants.pinsContainerElement.children).forEach((element) => {
+    if (element.matches(`.map__pin`) && !element.matches(`.map__pin--main`)) {
+      element.remove();
+    }
+  });
+};
+
 window.page = {
   activate: activatePage,
+  disactivate: disactivatePage,
   getFilteredAds: () => {
     return adsFiltered;
   },

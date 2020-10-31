@@ -11,10 +11,6 @@ const MAX_PRICE = 1000000;
 const HIGH_PRICE_MESSAGE = `Цена не может превышать ${MAX_PRICE}`;
 const SHORT_TITLE_MESSAGE = `Описание должно быть не короче ${TITLE_LENGTH_MIN} символов`;
 const LONG_TITLE_MESSAGE = `Вы достигли максимальной длины описания в ${TITLE_LENGTH_MAX} символов`;
-const StartCoordinates = {
-  x: 570,
-  y: 375
-};
 const mainElement = document.querySelector(`main`);
 const roomNumberInput = window.constants.adFormElement.querySelector(`#room_number`);
 const guestsAmountInput = window.constants.adFormElement.querySelector(`#capacity`);
@@ -107,23 +103,6 @@ const validateTitle = () => {
   titleInput.reportValidity();
 };
 
-const disactivatePage = () => {
-  window.constants.adFormElement.reset();
-  window.constants.filtersFormElement.reset();
-  window.constants.mapElement.classList.add(`map--faded`);
-  setFormElementsState(window.constants.adFormElement, true);
-  window.constants.adFormElement.classList.add(`ad-form--disabled`);
-  window.map.closeCard();
-  window.map.setMainPinCoords(StartCoordinates.x, StartCoordinates.y);
-  window.map.setInputAdress(window.constants.startPinElement.offsetLeft, window.constants.startPinElement.offsetTop, false);
-
-  Array.from(window.constants.pinsContainerElement.children).forEach((element) => {
-    if (element.matches(`.map__pin`) && !element.matches(`.map__pin--main`)) {
-      element.remove();
-    }
-  });
-};
-
 const onDocumentEscCloseSuccessPopup = (evt) => {
   if (evt.key === window.constants.escape) {
     deleteMessagePopup(document.querySelector(`.success`), onDocumentEscCloseSuccessPopup, onDocumentClickCloseSuccessPopup);
@@ -162,7 +141,7 @@ const errorHandler = () => {
 };
 
 const successHandler = () => {
-  disactivatePage();
+  window.page.disactivate();
   createMessagePopup(successMessageTemplate, onDocumentEscCloseSuccessPopup, onDocumentClickCloseSuccessPopup);
 };
 
@@ -174,7 +153,7 @@ const onSubmitHandler = (evt) => {
 
 const onResetHandler = (evt) => {
   evt.preventDefault();
-  disactivatePage();
+  window.page.disactivate();
 };
 
 titleInput.addEventListener(`input`, () => {
