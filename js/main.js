@@ -13,13 +13,14 @@ window.constants.startPinElement.addEventListener(`mousedown`, (evt) => {
   window.page.activate(evt);
   window.map.setInputAdress(window.constants.startPinElement.offsetLeft, window.constants.startPinElement.offsetTop, IS_PAGE_ACTIVE);
   window.map.activateMainPin();
-  window.filter.setSelectChangeHandler(() => {
+  window.filter.setSelectChangeHandler(window.debounce(() => {
     window.filter.start(window.page.getFilteredAds());
-  });
+  }));
+  window.filter.setInputChangeHandler(window.debounce(() => {
+    window.filter.start(window.page.getFilteredAds());
+  }));
 });
 
 window.constants.startPinElement.addEventListener(`keydown`, (evt) => {
   window.page.activate(evt);
 });
-
-
