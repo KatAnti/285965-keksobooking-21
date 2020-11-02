@@ -1,7 +1,7 @@
 'use strict';
-
-let adsFiltered = [];
+const IS_DISABLED = true;
 const LEFT_BTN = 0;
+let adsFiltered = [];
 const StartCoordinates = {
   x: 570,
   y: 375
@@ -53,17 +53,20 @@ const activatePage = (evt) => {
     window.constants.mapElement.classList.remove(`map--faded`);
     window.constants.adFormElement.classList.remove(`ad-form--disabled`);
     window.backend.load(successHandler, errorHandler);
-    window.form.setState(window.constants.adFormElement, false);
+    window.form.setState(window.constants.adFormElement, !IS_DISABLED);
+    window.form.setState(window.constants.filtersFormElement, !IS_DISABLED);
   }
 };
 
 const disactivatePage = () => {
   window.constants.adFormElement.reset();
   window.constants.filtersFormElement.reset();
-  window.form.syncMinPrice();
   window.constants.mapElement.classList.add(`map--faded`);
-  window.form.setState(window.constants.adFormElement, true);
   window.constants.adFormElement.classList.add(`ad-form--disabled`);
+  window.form.setState(window.constants.adFormElement, IS_DISABLED);
+  window.form.setState(window.constants.filtersFormElement, IS_DISABLED);
+  window.form.clearUploaded();
+  window.form.syncMinPrice();
   window.map.closeCard();
   window.map.setMainPinCoords(StartCoordinates.x, StartCoordinates.y);
   window.map.setInputAdress(window.constants.startPinElement.offsetLeft, window.constants.startPinElement.offsetTop, false);

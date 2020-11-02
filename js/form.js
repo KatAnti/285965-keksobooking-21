@@ -3,14 +3,16 @@
 const ROOMS_MAX = `100`;
 const TITLE_LENGTH_MIN = 30;
 const TITLE_LENGTH_MAX = 100;
-const BUNGALOW_MIN_PRICE = 0;
-const FLAT_MIN_PRICE = 1000;
-const HOUSE_MIN_PRICE = 5000;
-const PALACE_MIN_PRICE = 10000;
 const MAX_PRICE = 1000000;
 const HIGH_PRICE_MESSAGE = `Цена не может превышать ${MAX_PRICE}`;
 const SHORT_TITLE_MESSAGE = `Описание должно быть не короче ${TITLE_LENGTH_MIN} символов`;
 const LONG_TITLE_MESSAGE = `Вы достигли максимальной длины описания в ${TITLE_LENGTH_MAX} символов`;
+const MinPrices = {
+  bungalow: 0,
+  flat: 1000,
+  house: 5000,
+  palace: 10000,
+};
 const mainElement = document.querySelector(`main`);
 const roomNumberInput = window.constants.adFormElement.querySelector(`#room_number`);
 const guestsAmountInput = window.constants.adFormElement.querySelector(`#capacity`);
@@ -53,24 +55,8 @@ const checkRoomsNumberCapacity = () => {
 };
 
 const syncMinPriceAndType = () => {
-  switch (typeInput.value) {
-    case `bungalow`:
-      priceInput.min = BUNGALOW_MIN_PRICE;
-      priceInput.placeholder = `${BUNGALOW_MIN_PRICE}`;
-      break;
-    case `flat`:
-      priceInput.min = FLAT_MIN_PRICE;
-      priceInput.placeholder = `${FLAT_MIN_PRICE}`;
-      break;
-    case `house`:
-      priceInput.min = HOUSE_MIN_PRICE;
-      priceInput.placeholder = `${HOUSE_MIN_PRICE}`;
-      break;
-    case `palace`:
-      priceInput.min = PALACE_MIN_PRICE;
-      priceInput.placeholder = `${PALACE_MIN_PRICE}`;
-      break;
-  }
+  priceInput.min = MinPrices[typeInput.value];
+  priceInput.placeholder = `${MinPrices[typeInput.value]}`;
 };
 
 const validatePrice = () => {
@@ -103,55 +89,64 @@ const validateTitle = () => {
   titleInput.reportValidity();
 };
 
-const onDocumentEscCloseSuccessPopup = (evt) => {
-  if (evt.key === window.constants.escape) {
-    deleteMessagePopup(document.querySelector(`.success`), onDocumentEscCloseSuccessPopup, onDocumentClickCloseSuccessPopup);
+const deleteUploadedImages = () => {
+  window.constants.adFormElement.querySelector(`.ad-form-header__preview img`).src = `img/muffin-grey.svg`;
+  if (window.constants.adFormElement.querySelector(`.ad-form__photo img`)) {
+    window.constants.adFormElement.querySelector(`.ad-form__photo img`).remove();
   }
 };
 
-const onDocumentClickCloseSuccessPopup = () => {
-  deleteMessagePopup(document.querySelector(`.success`), onDocumentEscCloseSuccessPopup, onDocumentClickCloseSuccessPopup);
-};
-
-const onDocumentEscCloseErrorPopup = (evt) => {
-  if (evt.key === window.constants.escape) {
-    deleteMessagePopup(document.querySelector(`.error`), onDocumentEscCloseErrorPopup, onDocumentClickCloseErrorPopup);
-  }
-};
-
-const onDocumentClickCloseErrorPopup = () => {
-  deleteMessagePopup(document.querySelector(`.error`), onDocumentEscCloseErrorPopup, onDocumentClickCloseErrorPopup);
-};
-
-const createMessagePopup = (template, onEsc, onClick) => {
+const createMessagePopup = (template, onDocumentEsc, onDocumenClick) => {
   const message = template.cloneNode(true);
   mainElement.appendChild(message);
-  document.addEventListener(`keydown`, onEsc);
-  document.addEventListener(`click`, onClick);
+  document.addEventListener(`keydown`, onDocumentEsc);
+  document.addEventListener(`click`, onDocumenClick);
 };
 
-const deleteMessagePopup = (popup, onEsc, onClick) => {
+const deleteMessagePopup = (popup, onDocumentEsc, onDocumenClick) => {
   popup.remove();
-  document.removeEventListener(`keydown`, onEsc);
-  document.removeEventListener(`click`, onClick);
+  document.removeEventListener(`keydown`, onDocumentEsc);
+  document.removeEventListener(`click`, onDocumenClick);
+};
+
+const onDocumentEscClosePopup = (evt) => {
+  const successElement = document.querySelector(`.success`);
+  const errorElement = document.querySelector(`.error`);
+
+  if (evt.key === window.constants.escape && successElement) {
+    deleteMessagePopup(successElement, onDocumentEscClosePopup, onDocumentClickClosePopup);
+  } else if (evt.key === window.constants.escape && errorElement) {
+    deleteMessagePopup(errorElement, onDocumentEscClosePopup, onDocumentClickClosePopup);
+  }
+};
+
+const onDocumentClickClosePopup = () => {
+  const successElement = document.querySelector(`.success`);
+  const errorElement = document.querySelector(`.error`);
+
+  if (successElement) {
+    deleteMessagePopup(successElement, onDocumentEscClosePopup, onDocumentClickClosePopup);
+  } else if (errorElement) {
+    deleteMessagePopup(errorElement, onDocumentEscClosePopup, onDocumentClickClosePopup);
+  }
 };
 
 const errorHandler = () => {
-  createMessagePopup(errorMessageTemplate, onDocumentEscCloseErrorPopup, onDocumentClickCloseErrorPopup);
+  createMessagePopup(errorMessageTemplate, onDocumentEscClosePopup, onDocumentClickClosePopup);
 };
 
 const successHandler = () => {
   window.page.disactivate();
-  createMessagePopup(successMessageTemplate, onDocumentEscCloseSuccessPopup, onDocumentClickCloseSuccessPopup);
+  createMessagePopup(successMessageTemplate, onDocumentEscClosePopup, onDocumentClickClosePopup);
 };
 
-const onSubmitHandler = (evt) => {
+const onFormSubmit = (evt) => {
   evt.preventDefault();
 
   window.backend.send(new FormData(window.constants.adFormElement), successHandler, errorHandler);
 };
 
-const onResetHandler = (evt) => {
+const onResetButtonClick = (evt) => {
   evt.preventDefault();
   window.page.disactivate();
 };
@@ -164,27 +159,28 @@ priceInput.addEventListener(`input`, () => {
   validatePrice();
 });
 
-roomNumberInput.addEventListener(`click`, () => {
+roomNumberInput.addEventListener(`change`, () => {
   checkRoomsNumberCapacity();
 });
 
-typeInput.addEventListener(`click`, () => {
+typeInput.addEventListener(`change`, () => {
   syncMinPriceAndType();
 });
 
-checkInInput.addEventListener(`click`, (evt) => {
+checkInInput.addEventListener(`change`, (evt) => {
   syncTime(evt);
 });
 
-checkOutInput.addEventListener(`click`, (evt) => {
+checkOutInput.addEventListener(`change`, (evt) => {
   syncTime(evt);
 });
 
-window.constants.adFormElement.addEventListener(`submit`, onSubmitHandler);
-resetFormButton.addEventListener(`click`, onResetHandler);
+window.constants.adFormElement.addEventListener(`submit`, onFormSubmit);
+resetFormButton.addEventListener(`click`, onResetButtonClick);
 
 window.form = {
   setState: setFormElementsState,
   checkCapacity: checkRoomsNumberCapacity,
-  syncMinPrice: syncMinPriceAndType
+  syncMinPrice: syncMinPriceAndType,
+  clearUploaded: deleteUploadedImages
 };

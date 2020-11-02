@@ -35,7 +35,7 @@ const getMainPinCoords = {
   y: () => window.constants.startPinElement.offsetTop
 };
 
-const onPopupEscPress = (evt) => {
+const onDocumentEscPress = (evt) => {
   if (evt.key === window.constants.escape) {
     evt.preventDefault();
     closeCard();
@@ -48,7 +48,7 @@ const closeCard = () => {
     popup.remove();
   }
 
-  document.removeEventListener(`keypress`, onPopupEscPress);
+  document.removeEventListener(`keypress`, onDocumentEscPress);
 };
 
 const onPopupCloseClick = () => {
@@ -61,7 +61,7 @@ const openCard = (adsArr, currentId) => {
     .querySelector(`.popup__close`);
 
   closePopupBtn.addEventListener(`click`, onPopupCloseClick);
-  document.addEventListener(`keydown`, onPopupEscPress);
+  document.addEventListener(`keydown`, onDocumentEscPress);
 };
 
 const createPins = (adsArr, maxNumber) => {
@@ -81,14 +81,14 @@ const createPins = (adsArr, maxNumber) => {
 };
 
 const activateMainPin = () => {
-  const onMouseMove = (mouseEvt) => {
+  const onPinMouseMove = (mouseEvt) => {
     setMainPinCoords((getMainPinCoords.x() + mouseEvt.movementX), (getMainPinCoords.y() + mouseEvt.movementY));
 
     const preventPinCrossingBorder = (pinCoord, borderCoord, isMin) => {
-      let coords = (pinCoord === `x`) ? {x: borderCoord, y: false} : {x: false, y: borderCoord};
+      const coords = (pinCoord === `x`) ? {x: borderCoord, y: false} : {x: false, y: borderCoord};
       const isCrosingIndicator = isMin ? getMainPinCoords[pinCoord]() < borderCoord : getMainPinCoords[pinCoord]() > borderCoord;
       if (isCrosingIndicator) {
-        window.constants.pinsContainerElement.removeEventListener(`mousemove`, onMouseMove);
+        window.constants.pinsContainerElement.removeEventListener(`mousemove`, onPinMouseMove);
         setMainPinCoords(coords.x, coords.y);
       }
     };
@@ -99,19 +99,19 @@ const activateMainPin = () => {
     preventPinCrossingBorder(`y`, maxBottom, false);
 
     window.constants.pinsContainerElement.addEventListener(`mouseleave`, () => {
-      window.constants.pinsContainerElement.removeEventListener(`mousemove`, onMouseMove);
+      window.constants.pinsContainerElement.removeEventListener(`mousemove`, onPinMouseMove);
     });
 
     setInputAdress(getMainPinCoords.x(), getMainPinCoords.y(), true);
   };
 
-  const onMouseUp = () => {
-    window.constants.pinsContainerElement.removeEventListener(`mousemove`, onMouseMove);
+  const onPinMouseUp = () => {
+    window.constants.pinsContainerElement.removeEventListener(`mousemove`, onPinMouseMove);
     setInputAdress(getMainPinCoords.x(), getMainPinCoords.y(), true);
   };
 
-  window.constants.pinsContainerElement.addEventListener(`mousemove`, onMouseMove);
-  window.constants.pinsContainerElement.addEventListener(`mouseup`, onMouseUp);
+  window.constants.pinsContainerElement.addEventListener(`mousemove`, onPinMouseMove);
+  window.constants.pinsContainerElement.addEventListener(`mouseup`, onPinMouseUp);
 };
 
 window.map = {
