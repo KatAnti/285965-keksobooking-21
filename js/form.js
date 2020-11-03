@@ -96,54 +96,54 @@ const deleteUploadedImages = () => {
   }
 };
 
-const createMessagePopup = (template, onDocumentEsc, onDocumenClick) => {
+const createMessagePopup = (template, onDocumentEscPress, onDocumenClick) => {
   const message = template.cloneNode(true);
   mainElement.appendChild(message);
-  document.addEventListener(`keydown`, onDocumentEsc);
+  document.addEventListener(`keydown`, onDocumentEscPress);
   document.addEventListener(`click`, onDocumenClick);
 };
 
-const deleteMessagePopup = (popup, onDocumentEsc, onDocumenClick) => {
+const deleteMessagePopup = (popup, onDocumentEscPress, onDocumenClick) => {
   popup.remove();
-  document.removeEventListener(`keydown`, onDocumentEsc);
+  document.removeEventListener(`keydown`, onDocumentEscPress);
   document.removeEventListener(`click`, onDocumenClick);
 };
 
-const onDocumentEscClosePopup = (evt) => {
+const onDocumentEscPress = (evt) => {
   const successElement = document.querySelector(`.success`);
   const errorElement = document.querySelector(`.error`);
 
   if (evt.key === window.constants.escape && successElement) {
-    deleteMessagePopup(successElement, onDocumentEscClosePopup, onDocumentClickClosePopup);
+    deleteMessagePopup(successElement, onDocumentEscPress, onDocumentClick);
   } else if (evt.key === window.constants.escape && errorElement) {
-    deleteMessagePopup(errorElement, onDocumentEscClosePopup, onDocumentClickClosePopup);
+    deleteMessagePopup(errorElement, onDocumentEscPress, onDocumentClick);
   }
 };
 
-const onDocumentClickClosePopup = () => {
+const onDocumentClick = () => {
   const successElement = document.querySelector(`.success`);
   const errorElement = document.querySelector(`.error`);
 
   if (successElement) {
-    deleteMessagePopup(successElement, onDocumentEscClosePopup, onDocumentClickClosePopup);
+    deleteMessagePopup(successElement, onDocumentEscPress, onDocumentClick);
   } else if (errorElement) {
-    deleteMessagePopup(errorElement, onDocumentEscClosePopup, onDocumentClickClosePopup);
+    deleteMessagePopup(errorElement, onDocumentEscPress, onDocumentClick);
   }
 };
 
-const errorHandler = () => {
-  createMessagePopup(errorMessageTemplate, onDocumentEscClosePopup, onDocumentClickClosePopup);
+const onContentError = () => {
+  createMessagePopup(errorMessageTemplate, onDocumentEscPress, onDocumentClick);
 };
 
-const successHandler = () => {
+const onContentLoad = () => {
   window.page.disactivate();
-  createMessagePopup(successMessageTemplate, onDocumentEscClosePopup, onDocumentClickClosePopup);
+  createMessagePopup(successMessageTemplate, onDocumentEscPress, onDocumentClick);
 };
 
 const onFormSubmit = (evt) => {
   evt.preventDefault();
 
-  window.backend.send(new FormData(window.constants.adFormElement), successHandler, errorHandler);
+  window.backend.send(new FormData(window.constants.adFormElement), onContentLoad, onContentError);
 };
 
 const onResetButtonClick = (evt) => {

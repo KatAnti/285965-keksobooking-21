@@ -3,7 +3,7 @@
 const urlGetAds = `https://21.javascript.pages.academy/keksobooking/data`;
 const urlSendForm = `https://21.javascript.pages.academy/keksobooking`;
 
-const makeRequest = (onSucсessLoad, onError) => {
+const makeRequest = (onContentLoad, onContentError) => {
   const TIMEOUT = 10000;
   const xhr = new XMLHttpRequest();
   const StatusCode = {
@@ -14,18 +14,18 @@ const makeRequest = (onSucсessLoad, onError) => {
 
   xhr.addEventListener(`load`, () => {
     if (xhr.status === StatusCode.OK) {
-      onSucсessLoad(xhr.response);
+      onContentLoad(xhr.response);
     } else {
-      onError(`Произошла ошибка! Статус ответа: ` + xhr.status + ` ` + xhr.statusText);
+      onContentError(`Произошла ошибка! Статус ответа: ` + xhr.status + ` ` + xhr.statusText);
     }
   });
 
   xhr.addEventListener(`error`, () => {
-    onError(`Произошла ошибка соединения`);
+    onContentError(`Произошла ошибка соединения`);
   });
 
   xhr.addEventListener(`timeout`, () => {
-    onError(`Запрос не успел выполниться за ` + xhr.timeout + `мc`);
+    onContentError(`Запрос не успел выполниться за ` + xhr.timeout + `мc`);
   });
 
   xhr.timeout = TIMEOUT;
@@ -33,14 +33,14 @@ const makeRequest = (onSucсessLoad, onError) => {
   return xhr;
 };
 
-const getAdsFromServer = (onSucсessLoad, onError) => {
-  const xhr = makeRequest(onSucсessLoad, onError);
+const getAdsFromServer = (onContentLoad, onContentError) => {
+  const xhr = makeRequest(onContentLoad, onContentError);
   xhr.open(`GET`, urlGetAds);
   xhr.send();
 };
 
-const sendFormData = (data, onSucсessLoad, onError) => {
-  const xhr = makeRequest(onSucсessLoad, onError);
+const sendFormData = (data, onContentLoad, onContentError) => {
+  const xhr = makeRequest(onContentLoad, onContentError);
   xhr.open(`POST`, urlSendForm);
   xhr.send(data);
 };
