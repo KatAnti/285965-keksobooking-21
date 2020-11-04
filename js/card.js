@@ -63,7 +63,7 @@ const renderAdCard = (adData) => {
   adCard.querySelector(`.popup__avatar`).src = adData.author.avatar;
   adCard.querySelector(`.popup__title`).textContent = adData.offer.title;
   adCard.querySelector(`.popup__text--address`).textContent = adData.offer.address;
-  adCard.querySelector(`.popup__text--price`).innerHTML = `${adData.offer.price}&#x20bd;<span>/ночь</span>`;
+  adCard.querySelector(`.popup__text--price`).textContent = `${adData.offer.price}₽/ночь`;
   adCard.querySelector(`.popup__type`).textContent = translateType[adData.offer.type];
   adCard.querySelector(`.popup__text--capacity`).textContent = `${adData.offer.rooms} комнаты для ${adData.offer.guests} гостей`;
   adCard.querySelector(`.popup__text--time`).textContent = `Заезд после ${adData.offer.checkin}, выезд до ${adData.offer.checkout}`;

@@ -44,8 +44,15 @@ const onDocumentEscPress = (evt) => {
 
 const closeCard = () => {
   const popup = window.constants.mapElement.querySelector(`.popup`);
+  const activePin = window.constants.mapElement.querySelector(`.map__pin--active`);
+
   if (popup) {
     popup.remove();
+  }
+
+  if (activePin) {
+    activePin.classList.remove(`map__pin--active`);
+    activePin.blur();
   }
 
   document.removeEventListener(`keypress`, onDocumentEscPress);
